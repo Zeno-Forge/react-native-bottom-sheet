@@ -389,9 +389,7 @@ const BottomSheetModalComponent = forwardRef<
           containerOffset={containerOffset}
           onChange={handleBottomSheetOnChange}
           onClose={handleBottomSheetOnClose}
-          children={
-            typeof Content === 'function' ? Content({ data }) : Content
-          }
+          children={typeof Content === 'function' ? Content({ data }) : Content}
           $modal={true}
         />
       </ContainerComponent>

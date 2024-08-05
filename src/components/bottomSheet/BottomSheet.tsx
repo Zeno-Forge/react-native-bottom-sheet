@@ -241,6 +241,7 @@ const BottomSheetComponent = forwardRef<BottomSheet, BottomSheetProps>(
     const animatedCurrentIndex = useReactiveSharedValue(
       animateOnMount ? -1 : _providedIndex
     );
+    const preKeyboardIndex = useSharedValue(INITIAL_POSITION);
     const animatedPosition = useSharedValue(INITIAL_POSITION);
     const animatedNextPosition = useSharedValue(INITIAL_VALUE);
     const animatedNextPositionIndex = useSharedValue(0);
@@ -556,7 +557,7 @@ const BottomSheetComponent = forwardRef<BottomSheet, BottomSheetProps>(
           animatedHandleGestureState.value !== State.ACTIVE
         ) {
           isInTemporaryPosition.value = false;
-          const nextPosition = snapPoints[currentIndex];
+          const nextPosition = snapPoints[preKeyboardIndex.value];
           return nextPosition;
         }
 
@@ -567,7 +568,10 @@ const BottomSheetComponent = forwardRef<BottomSheet, BottomSheetProps>(
           keyboardBehavior === KEYBOARD_BEHAVIOR.extend &&
           keyboardState === KEYBOARD_STATE.SHOWN
         ) {
-          return highestSnapPoint;
+          preKeyboardIndex.value = currentIndex;
+          const keyboardHeightInContainer =
+            animatedKeyboardHeightInContainer.value;
+          return Math.max(0, highestSnapPoint - keyboardHeightInContainer);
         }
 
         /**
@@ -578,6 +582,7 @@ const BottomSheetComponent = forwardRef<BottomSheet, BottomSheetProps>(
           keyboardState === KEYBOARD_STATE.SHOWN
         ) {
           isInTemporaryPosition.value = true;
+          preKeyboardIndex.value = currentIndex;
           return 0;
         }
 
@@ -591,7 +596,11 @@ const BottomSheetComponent = forwardRef<BottomSheet, BottomSheetProps>(
           isInTemporaryPosition.value = true;
           const keyboardHeightInContainer =
             animatedKeyboardHeightInContainer.value;
-          return Math.max(0, highestSnapPoint - keyboardHeightInContainer);
+          preKeyboardIndex.value = currentIndex;
+          return Math.max(
+            0,
+            snapPoints[currentIndex] - keyboardHeightInContainer
+          );
         }
 
         if (isInTemporaryPosition.value) {
